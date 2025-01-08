@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 #include <vector>
-#include <iostream>
+#include <set>
 
 #include "Utilities.h"
 
@@ -48,12 +48,15 @@ private:
 		VkDevice logicalDevice;
 	} mainDevice;
 	VkQueue graphicsQueue;
+	VkQueue presentationQueue;
+	VkSurfaceKHR surface;
 
 	// Vulkan Functions
 	// - Create Functions
 	void createInstance();
 	void createLogicalDevice();
 	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+	void createSurface();
 
 	// - Get Functions
 	void getPhysicalDevice();
@@ -62,11 +65,13 @@ private:
 	// - Support Functions
 	// -- Checker Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
-	bool checkDeviceSuitable(VkPhysicalDevice device);
+	bool checkDeviceExtensionsSupport(VkPhysicalDevice device);
 	bool checkValidationLayerSupport();
+	bool checkDeviceSuitable(VkPhysicalDevice device);
 
 	// -- Getter Functions
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+	SwapChainDetails getSwapChainDetails(VkPhysicalDevice device);
 
 	// -- Destroy Functions
 	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
