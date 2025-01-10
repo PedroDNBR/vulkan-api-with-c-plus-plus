@@ -17,12 +17,15 @@ public:
 	VulkanRenderer();
 
 	int init(GLFWwindow* newWindow);
+	void draw();
 	void cleanup();
 
 	~VulkanRenderer();
 
 private:
 	GLFWwindow* window;
+
+	int currentFrame = 0;
 
 	const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -70,6 +73,11 @@ private:
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
 
+	// - synchronisation
+	std::vector<VkSemaphore> imageAvailable;
+	std::vector<VkSemaphore> renderFinished;
+	std::vector<VkFence> drawFences;
+
 	// Vulkan Functions
 	// - Create Functions
 	void createInstance();
@@ -82,6 +90,7 @@ private:
 	void createFramebuffers();
 	void createCommandPool();
 	void createCommandBuffers();
+	void createSynchronisation();
 
 	// -- Record Functions
 	void recordCommands();
