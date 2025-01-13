@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 
+#include "Mesh.h"
 #include "Utilities.h"
 
 class VulkanRenderer
@@ -26,6 +27,9 @@ private:
 	GLFWwindow* window;
 
 	int currentFrame = 0;
+
+	// Scene Objects
+	Mesh firstMesh;
 
 	const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
