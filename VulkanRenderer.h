@@ -22,7 +22,7 @@ public:
 
 	int init(GLFWwindow* newWindow);
 	
-	void updateModel(glm::mat4 newModel);
+	void updateModel(int modelId, glm::mat4 newModel);
 
 	void draw();
 	void cleanup();
@@ -38,11 +38,10 @@ private:
 	std::vector<Mesh> meshList;
 
 	// Scene Settings
-	struct MVP {
+	struct UboViewProjection {
 		glm::mat4 projection;
 		glm::mat4 view;
-		glm::mat4 model;
-	} mvp;
+	} uboViewProjection;
 
 	const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -84,8 +83,15 @@ private:
 	VkDescriptorPool descriptorPool;
 	std::vector<VkDescriptorSet> descriptorSets;
 	
-	std::vector<VkBuffer> uniformBuffer;
-	std::vector<VkDeviceMemory> uniformBufferMemory;
+	std::vector<VkBuffer> vpUniformBuffer;
+	std::vector<VkDeviceMemory> vpUniformBufferMemory;
+
+	std::vector<VkBuffer> modelDUniformBuffer;
+	std::vector<VkDeviceMemory> modelDUniformBufferMemory;
+
+	VkDeviceSize minUniformBufferOffset;
+	size_t modelUniformAlignment;
+	UboModel* modelTransferSpace;
 	
 	// - Pipeline
 	VkPipeline graphicsPipeline;
@@ -123,7 +129,7 @@ private:
 	void createDescriptorPool();
 	void createDescriptorSets();
 
-	void updateUniformBuffer(uint32_t imageIndex);
+	void updateUniformBuffers(uint32_t imageIndex);
 
 	// -- Record Functions
 	void recordCommands();
@@ -131,6 +137,9 @@ private:
 	// - Get Functions
 	void getPhysicalDevice();
 	std::vector<const char*> getRequiredExtensions();
+
+	// - Allocate Functions
+	void allocateDynamicBufferTransferSpace();
 
 	// - Support Functions
 	// -- Checker Functions
