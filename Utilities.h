@@ -20,6 +20,7 @@ struct Vertex
 {
 	glm::vec3 pos; // Vertex Position (x, y, z)
 	glm::vec3 col; // Vertex Color (r, g, b)
+	glm::vec2 tex; // Texture Coords (u, v)
 };
 
 // Indices (locations) of Queue Families (if they exist at all)
@@ -229,7 +230,7 @@ static void copyImageBuffer(VkDevice device, VkQueue transferQueue, VkCommandPoo
 	imageRegion.imageSubresource.baseArrayLayer = 0;								// Starting array layer (if array)
 	imageRegion.imageSubresource.layerCount = 1;									// Number of layers to copy starting at baseArrayLayer
 	imageRegion.imageOffset = { 0, 0, 0 };											// Offset into image (as opposed to raw data in buffer offset)
-	imageRegion.imageExtent = { width, height, 0 };									// Size of region to copy as (x, y, z) values
+	imageRegion.imageExtent = { width, height, 1 };									// Size of region to copy as (x, y, z) values
 
 	// Copy buffer to given image
 	vkCmdCopyBufferToImage(transferCommandBuffer, srcBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageRegion);
