@@ -7,8 +7,7 @@
 
 #include "Utilities.h"
 
-struct Model
-{
+struct Model {
 	glm::mat4 model;
 };
 
@@ -16,19 +15,13 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(
-		VkPhysicalDevice newPhysicalDevice, 
-		VkDevice newDevice, 
-		VkQueue transferQueue, 
-		VkCommandPool transferCommandPool, 
-		std::vector<Vertex>* vertices,
-		std::vector<uint32_t>* indices,
-		int newTexId
-	);
+	Mesh(VkPhysicalDevice newPhysicalDevice, VkDevice newDevice, 
+		VkQueue transferQueue, VkCommandPool transferCommandPool, 
+		std::vector<Vertex> * vertices, std::vector<uint32_t> * indices,
+		int newTexId);
 
 	void setModel(glm::mat4 newModel);
 	Model getModel();
-	Model& getModelRef();
 
 	int getTexId();
 
@@ -44,7 +37,6 @@ public:
 
 private:
 	Model model;
-
 	int texId;
 
 	int vertexCount;
@@ -58,8 +50,7 @@ private:
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;
 
-	void createVertexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<Vertex>* vertices);
-	void createIndexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<uint32_t>* indices);
-
+	void createVertexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<Vertex> * vertices);
+	void createIndexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<uint32_t> * indices);
 };
 

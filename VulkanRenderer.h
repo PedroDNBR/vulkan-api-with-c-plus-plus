@@ -20,6 +20,7 @@
 
 #include "Mesh.h"
 #include "MeshModel.h"
+
 #include "Utilities.h"
 
 class VulkanRenderer
@@ -27,8 +28,8 @@ class VulkanRenderer
 public:
 	VulkanRenderer();
 
-	int init(GLFWwindow* newWindow);
-	
+	int init(GLFWwindow * newWindow);
+
 	int createMeshModel(std::string modelFile);
 	void updateModel(int modelId, glm::mat4 newModel);
 
@@ -38,7 +39,7 @@ public:
 	~VulkanRenderer();
 
 private:
-	GLFWwindow* window;
+	GLFWwindow * window;
 
 	int currentFrame = 0;
 
@@ -68,7 +69,6 @@ private:
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
-
 	// Vulkan Components
 	// - Main
 	VkInstance instance;
@@ -81,26 +81,34 @@ private:
 	VkQueue presentationQueue;
 	VkSurfaceKHR surface;
 	VkSwapchainKHR swapchain;
-	std::vector<SwapchainImage> swapchainImages;
+
+	std::vector<SwapchainImage> swapChainImages;
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkCommandBuffer> commandBuffers;
 
-	VkImage depthBufferImage;
-	VkDeviceMemory depthBufferImageMemory;
-	VkImageView depthBufferImageView;
+	std::vector<VkImage> colourBufferImage;
+	std::vector<VkDeviceMemory> colourBufferImageMemory;
+	std::vector<VkImageView> colourBufferImageView;
+
+	std::vector<VkImage> depthBufferImage;
+	std::vector<VkDeviceMemory> depthBufferImageMemory;
+	std::vector<VkImageView> depthBufferImageView;
 
 	VkSampler textureSampler;
 
 	// - Descriptors
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSetLayout samplerSetLayout;
+	VkDescriptorSetLayout inputSetLayout;
 	VkPushConstantRange pushConstantRange;
 
 	VkDescriptorPool descriptorPool;
 	VkDescriptorPool samplerDescriptorPool;
+	VkDescriptorPool inputDescriptorPool;
 	std::vector<VkDescriptorSet> descriptorSets;
 	std::vector<VkDescriptorSet> samplerDescriptorSets;
-	
+	std::vector<VkDescriptorSet> inputDescriptorSets;
+
 	std::vector<VkBuffer> vpUniformBuffer;
 	std::vector<VkDeviceMemory> vpUniformBufferMemory;
 
@@ -109,26 +117,31 @@ private:
 
 	//VkDeviceSize minUniformBufferOffset;
 	//size_t modelUniformAlignment;
-	//Model* modelTransferSpace;
+	//UboModel * modelTransferSpace;
 
 	// - Assets
+	
 	std::vector<VkImage> textureImages;
 	std::vector<VkDeviceMemory> textureImageMemory;
 	std::vector<VkImageView> textureImageViews;
-	
+
 	// - Pipeline
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
+
+	VkPipeline secondPipeline;
+	VkPipelineLayout secondPipelineLayout;
+
 	VkRenderPass renderPass;
 
 	// - Pools
 	VkCommandPool graphicsCommandPool;
 
 	// - Utility
-	VkFormat swapchainImageFormat;
-	VkExtent2D swapchainExtent;
+	VkFormat swapChainImageFormat;
+	VkExtent2D swapChainExtent;
 
-	// - synchronisation
+	// - Synchronisation
 	std::vector<VkSemaphore> imageAvailable;
 	std::vector<VkSemaphore> renderFinished;
 	std::vector<VkFence> drawFences;
@@ -144,33 +157,34 @@ private:
 	void createDescriptorSetLayout();
 	void createPushConstantRange();
 	void createGraphicsPipeline();
+	void createColourBufferImage();
 	void createDepthBufferImage();
 	void createFramebuffers();
 	void createCommandPool();
 	void createCommandBuffers();
 	void createSynchronisation();
 	void createTextureSampler();
-	
+
 	void createUniformBuffers();
 	void createDescriptorPool();
 	void createDescriptorSets();
+	void createInputDescriptorSets();
 
 	void updateUniformBuffers(uint32_t imageIndex);
 
-	// -- Record Functions
+	// - Record Functions
 	void recordCommands(uint32_t currentImage);
 
 	// - Get Functions
 	void getPhysicalDevice();
-	std::vector<const char*> getRequiredExtensions();
 
 	// - Allocate Functions
 	void allocateDynamicBufferTransferSpace();
 
 	// - Support Functions
 	// -- Checker Functions
-	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
-	bool checkDeviceExtensionsSupport(VkPhysicalDevice device);
+	bool checkInstanceExtensionSupport(std::vector<const char*> * checkExtensions);
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	bool checkValidationLayerSupport();
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 
@@ -179,24 +193,24 @@ private:
 	SwapChainDetails getSwapChainDetails(VkPhysicalDevice device);
 
 	// -- Choose Functions
-	VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats);
+	VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats);
 	VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR> presentationModes);
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
-	VkFormat chooseSupportedFormat(const std::vector<VkFormat>& formats, VkImageTiling tiling, VkFormatFeatureFlagBits featureFlags);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &surfaceCapabilities);
+	VkFormat chooseSupportedFormat(const std::vector<VkFormat> &formats, VkImageTiling tiling, VkFormatFeatureFlags featureFlags);
 
 	// -- Create Functions
-	VkImage createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags useFlags, VkMemoryPropertyFlags propFlags, VkDeviceMemory* imageMemory);
+	VkImage createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags useFlags,
+		VkMemoryPropertyFlags propFlags, VkDeviceMemory *imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-	VkShaderModule createShaderModule(const std::vector<char>& code);
+	VkShaderModule createShaderModule(const std::vector<char> &code);
 
 	int createTextureImage(std::string fileName);
 	int createTexture(std::string fileName);
 	int createTextureDescriptor(VkImageView textureImage);
 
+
 	// -- Loader Functions
-	stbi_uc* loadTextureFile(std::string fileName, int* width, int* height, VkDeviceSize* imageSize);
-
-
+	stbi_uc * loadTextureFile(std::string fileName, int * width, int * height, VkDeviceSize * imageSize);
 	// -- Destroy Functions
 	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 };
